@@ -39,7 +39,7 @@ class App extends React.Component {
           // setState is async so its not guaranted to call it after setState what we can do is pass log into second argument of setState
           // console.log(snapshot.data());
 
-          console.log(this.state);
+          // console.log(this.state);
         });
       }
       // if user is null
