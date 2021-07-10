@@ -26,13 +26,14 @@ class App extends React.Component {
     // open subscription
     // app listen to state changed on firebase auth
     this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
-      // this.setState({currentUser: user});
-      // console.log(user);
+      // this.setState({currentUser: userAuth});
+      // console.log(userAuth);
 
       if (userAuth) {
         const userRef = await createUserProfileDocument(userAuth);
 
         // fetching the data stored in db
+        // listens to every change in our firestore document
         userRef.onSnapshot(snapshot => {
           setCurrentUser({ id: snapshot.id, ...snapshot.data() });
           // this.setState({
@@ -48,9 +49,14 @@ class App extends React.Component {
         });
       }
       // if user is null
-      else {
-        // this.setState({ currentUser: userAuth });
-      }
+      setCurrentUser(userAuth);
+      // this.setState({ currentUser: userAuth });
+
+      // it helps us to populate shop data into firestore
+      // addCollectionAndDocument(
+      //   'collections',
+      //   collectionArray.map(({ title, items }) => ({ title, items }))
+      // );
     });
   }
 
@@ -86,6 +92,7 @@ class App extends React.Component {
 
 const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser,
+  // collectionArray: selectShopCollectionsForPreview,
 });
 
 const mapDispatchToProps = dispatch => ({

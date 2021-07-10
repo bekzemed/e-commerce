@@ -12,17 +12,22 @@ const firebaseConfig = {
   measurementId: 'G-HP6DQMN9MH',
 };
 
+// used to add document
 export const createUserProfileDocument = async (userAuth, additionalData) => {
   // if there is no user logged in return from the function
   if (!userAuth) return;
   // check firestore database if user exists
   // we can perform CRUD on document reference(firestore.doc()) like .set() .get() .update() .delete()
   const userRef = firestore.doc(`/users/${userAuth.uid}`);
+  // const collectionRef = firestore.collection('collections')
 
-  // get collection of users from database
+  // get users document from database
   const snapshot = await userRef.get();
+  // const collectionSnapshot = await collectionRef.get()
 
-  // if user signed in using google oAuth is not in the database set that user and save it into users collection in the databse
+  // console.log({collection: collectionSnapshot.docs.map(doc => doc.data())});
+
+  // if user signed in using google oAuth and it is not in the database set that user and save it into users collection in the databse
   if (!snapshot.exists) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
@@ -34,6 +39,42 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
   }
 
   return userRef;
+};
+
+// uses to add collection and coorosponding documents
+export const addCollectionAndDocument = async (collectionKey, objectsToAdd) => {
+  // collection reference
+  const collectionRef = firestore.collection(collectionKey);
+
+  // batch helps batch the request as a big chunk at once
+  const batch = firestore.batch();
+
+  objectsToAdd.forEach(obj => {
+    // it helps to create new document with unique id
+    const newDocRef = collectionRef.doc();
+
+    batch.set(newDocRef, obj);
+  });
+
+  return await batch.commit();
+};
+
+export const convertCollectionsSnapshotToMap = collectionsSnapshot => {
+  const transformedCollection = collectionsSnapshot.docs.map(document => {
+    const { title, items } = document.data();
+
+    return {
+      routeName: encodeURI(title.toLowerCase()),
+      id: document.id,
+      title,
+      items,
+    };
+  });
+  // console.log(transformedCollection, 'here');
+  return transformedCollection.reduce((accumulator, collections) => {
+    accumulator[collections.title.toLowerCase()] = collections;
+    return accumulator;
+  }, {});
 };
 
 // check whether firebase is initialized or not
