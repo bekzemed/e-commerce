@@ -1,13 +1,29 @@
+import { userActionTypes } from './user.types';
+
 const initialState = {
   currentUser: null,
+  isFetching: false,
+  errorMessage: '',
 };
 
 const userReducer = (state = initialState, action) => {
   switch (action.type) {
-    case 'SET_CURRENT_USER':
+    case userActionTypes.FETCH_USER_START:
+      return {
+        ...state,
+        isFetching: true,
+      };
+    case userActionTypes.FETCH_USER_SUCCESS:
       return {
         ...state,
         currentUser: action.payload,
+        isFetching: false,
+      };
+    case userActionTypes.FETCH_USER_FAILURE:
+      return {
+        ...state,
+        isFetching: false,
+        errorMessage: action.payload,
       };
 
     default:
