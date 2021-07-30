@@ -1,35 +1,51 @@
-import { auth, createUserProfileDocument } from '../../firebase/firebase.utils';
 import { userActionTypes } from './user.types';
 
-export const fetchUserSuccess = user => ({
-  type: userActionTypes.FETCH_USER_SUCCESS,
+export const googleSignInStart = () => ({
+  type: userActionTypes.GOOGLE_SIGN_IN_START,
+});
+export const emailSignInStart = emailAndPassword => ({
+  type: userActionTypes.EMAIL_SIGN_IN_START,
+  payload: emailAndPassword,
+});
+
+export const signInSuccess = user => ({
+  type: userActionTypes.SIGN_IN_SUCCESS,
   payload: user,
 });
 
-export const fetchUserStart = () => ({
-  type: userActionTypes.FETCH_USER_START,
-});
-
-export const fetchUserFailure = errorMessage => ({
-  type: userActionTypes.FETCH_USER_FAILURE,
+export const signInFailure = errorMessage => ({
+  type: userActionTypes.SIGN_IN_FAILURE,
   payload: errorMessage,
 });
 
-export const fetchUserStartAsync = () => {
-  return dispatch => {
-    auth.onAuthStateChanged(async userAuth => {
-      if (userAuth) {
-        const userRef = await createUserProfileDocument(userAuth);
+export const checkUserSession = () => ({
+  type: userActionTypes.CHECK_USER_SESSION,
+});
 
-        userRef
-          .get()
-          .then(snapshot => {
-            console.log(snapshot.data());
-            dispatch(fetchUserSuccess({ id: snapshot.id, ...snapshot.data() }));
-          })
-          .catch(error => dispatch(fetchUserFailure(error.message)));
-      }
-      dispatch(fetchUserSuccess(userAuth));
-    });
-  };
-};
+export const signOutUser = () => ({
+  type: userActionTypes.SIGN_OUT,
+});
+
+export const signOutFailure = errorMessage => ({
+  type: userActionTypes.SIGN_OUT_FAILURE,
+  payload: errorMessage,
+});
+
+export const signOutSuccess = () => ({
+  type: userActionTypes.SIGN_OUT_SUCCESS,
+});
+
+export const signUpStart = user => ({
+  type: userActionTypes.SIGN_UP_START,
+  payload: user,
+});
+
+export const signUpSuccess = ({ user, additionalData }) => ({
+  type: userActionTypes.SIGN_UP_SUCCESS,
+  payload: { user, additionalData },
+});
+
+export const signUpFailure = errorMessage => ({
+  type: userActionTypes.SIGN_UP_FAILURE,
+  payload: errorMessage,
+});
